@@ -1,10 +1,8 @@
 package example.com.nccmobile;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +10,6 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 
 
@@ -28,7 +25,7 @@ import java.util.List;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class ItemListFragment extends Fragment implements AbsListView.OnItemClickListener {
+public class FavoriteListFragment extends Fragment implements AbsListView.OnItemClickListener {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -57,9 +54,10 @@ public class ItemListFragment extends Fragment implements AbsListView.OnItemClic
      */
     private List<Item> items;
 
+
     // TODO: Rename and change types of parameters
-    public static ItemListFragment newInstance(String param1, String param2) {
-        ItemListFragment fragment = new ItemListFragment();
+    public static FavoriteListFragment newInstance(String param1, String param2) {
+        FavoriteListFragment fragment = new FavoriteListFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -71,20 +69,7 @@ public class ItemListFragment extends Fragment implements AbsListView.OnItemClic
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public ItemListFragment() {
-    }
-
-    public void initAdapter() {
-        items = Item.getAll();
-        ArrayList<String> itemNames = new ArrayList<String>();
-
-        for(int i = 0; i < items.size(); ++i) {
-            itemNames.add(items.get(i).getName());
-        }
-
-        mAdapter = new ArrayAdapter<String>(getActivity(),
-                android.R.layout.simple_list_item_1, itemNames);
-
+    public FavoriteListFragment() {
     }
 
     @Override
@@ -96,13 +81,21 @@ public class ItemListFragment extends Fragment implements AbsListView.OnItemClic
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
-        initAdapter();
+        items = Item.getAllFavorites();
+        ArrayList<String> itemNames = new ArrayList<String>();
+
+        for(int i = 0; i < items.size(); ++i) {
+            itemNames.add(items.get(i).getName());
+        }
+
+        mAdapter = new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_list_item_1, itemNames);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_item, container, false);
+        View view = inflater.inflate(R.layout.fragment_favoritte, container, false);
 
         // Set the adapter
         mListView = (AbsListView) view.findViewById(android.R.id.list);
@@ -134,13 +127,6 @@ public class ItemListFragment extends Fragment implements AbsListView.OnItemClic
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Log.i("onItemClick", String.valueOf(position));
-        /*
-            ItemActivity.selectedItem = items.get(position);
-            Intent intent = new Intent(getApplicationContext(), ItemActivity.class);
-            startActivity(intent);
-        */
-
         if (null != mListener) {
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.

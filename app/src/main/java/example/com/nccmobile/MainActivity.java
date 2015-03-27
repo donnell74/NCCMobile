@@ -22,7 +22,9 @@ import java.util.List;
 import com.activeandroid.query.Select;
 
 public class MainActivity extends ActionBarActivity
-        implements ItemListFragment.OnFragmentInteractionListener {
+        implements ItemListFragment.OnFragmentInteractionListener,
+                   FavoriteListFragment.OnFragmentInteractionListener,
+                   CartListFragment.OnFragmentInteractionListener {
     private List<String> mNavTitles;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -30,8 +32,9 @@ public class MainActivity extends ActionBarActivity
 
     // used for passing position into change fragment
     private static final int ITEMLISTFRAGMENT = 0;
+    private static final int CARTLISTFRAGMENT = 1;
+    private static final int FAVORITELISTFRAGMENT = 2;
     private static final int ITEMDETAILEDFRAGMENT = 10;
-
 
     private String mTitle = "NCC 2015";
 
@@ -104,7 +107,7 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public void onFragmentInteraction(long id) {
-        ItemFragment.selectedItem = new Select().from(Item.class).where("_id = ?", id).executeSingle();
+        ItemFragment.selectedItem = Item.load(Item.class, id);
         changeFragment(ITEMDETAILEDFRAGMENT);
     }
 
@@ -130,6 +133,12 @@ public class MainActivity extends ActionBarActivity
                 break;
             case ITEMDETAILEDFRAGMENT:
                 fragment = new ItemFragment();
+                break;
+            case CARTLISTFRAGMENT:
+                fragment = new CartListFragment();
+                break;
+            case FAVORITELISTFRAGMENT:
+                fragment = new FavoriteListFragment();
                 break;
             default:
                 fragment = new ItemListFragment();

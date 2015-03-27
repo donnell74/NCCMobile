@@ -3,10 +3,14 @@ package example.com.nccmobile;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 /**
@@ -24,6 +28,10 @@ public class ItemFragment extends Fragment {
 
     private View mView;
     public static Item selectedItem;
+    public Cart mCart = null;
+
+    ImageButton favBtn;
+    Button cartBtn;
 
     /**
      * Use this factory method to create a new instance of
@@ -57,10 +65,84 @@ public class ItemFragment extends Fragment {
     }
 
 
-    private void initDetailedView() {
+    private void updateDetails() {
         bindMemberTextView(R.id.name, selectedItem.getName());
         bindMemberTextView(R.id.price, String.valueOf(selectedItem.getPrice()));
         bindMemberTextView(R.id.quantityInStock, String.valueOf(selectedItem.getQuantityInStock()));
+    }
+
+
+    private void initDetailedView() {
+        favBtn = (ImageButton) mView.findViewById(R.id.favBtn);
+        favBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if ( selectedItem.isFav == 0 ) {
+                    selectedItem.isFav = 1;
+                    Log.i(selectedItem.getName(), "Is now favorited");
+                } else {
+                    selectedItem.isFav = 0;
+                    Log.i(selectedItem.getName(), "Is now not favorited");
+                }
+
+                selectedItem.save();
+                updateView();
+            }
+        });
+
+        cartBtn = (Button) mView.findViewById(R.id.cartBtn);
+        cartBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (selectedItem.quantityInStock > 0) {
+                    // check if cart row for item and user
+                    if (mCart == null) {
+                        mCart = Cart.findItemId(selectedItem.getId());
+                    }
+
+                    if (mCart != null) {
+                        mCart.quantityInCart += 1;
+                        selectedItem.quantityInStock -= 1;
+
+                        mCart.save();
+                        selectedItem.save();
+                    } else {
+                        mCart = new Cart(selectedItem);
+                        selectedItem.quantityInStock -= 1;
+
+                        mCart.save();
+                        selectedItem.save();
+                    }
+                    // toast( "Added to cart" );
+                    Toast.makeText(getActivity().getApplicationContext(),
+                            "Added to cart",
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    // toast that is none in stock
+                    Toast.makeText(getActivity().getApplicationContext(),
+                            "That item is not in stock",
+                            Toast.LENGTH_SHORT).show();
+
+                }
+
+                updateView();
+            }
+        });
+
+        updateView();
+    }
+
+    private void updateView() {
+        updateDetails();
+        updateFavIcon();
+    }
+
+    private void updateFavIcon() {
+        if (selectedItem.isFav == 1) {
+            favBtn.setImageResource(R.drawable.ic_action_important);
+        } else {
+            favBtn.setImageResource(R.drawable.ic_action_not_important);
+        }
     }
 
 
@@ -75,7 +157,9 @@ public class ItemFragment extends Fragment {
         // Inflate the layout for this fragment
         mView = inflater.inflate(R.layout.fragment_item_detailed, container, false);
 
+        Log.i("Item Detailed", selectedItem.toString());
         initDetailedView();
+
         return mView;
     }
 
@@ -89,5 +173,4 @@ public class ItemFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
     }
-
 }

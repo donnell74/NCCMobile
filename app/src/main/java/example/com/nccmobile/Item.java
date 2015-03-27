@@ -7,10 +7,7 @@ import com.activeandroid.query.Select;
 
 import java.util.List;
 
-/**
- * Created by greg on 3/24/15.
- */
-@Table(name = "items", id = "_id")
+@Table(name = "items")
 public class Item extends Model {
     @Column(name = "name")
     public String name;
@@ -22,25 +19,31 @@ public class Item extends Model {
     public int quantityInStock;
     @Column(name = "category")
     public String category;
+    @Column(name = "isFav")
+    public int isFav;
 
     public Item() {
         super();
     }
 
-    public Item(String name, String image, Double price, int quantityInStock, String category) {
+    public Item(String name, String image, Double price, int quantityInStock, String category, int isFav) {
+        super();
         this.name = name;
         this.image = image;
         this.price = price;
         this.quantityInStock = quantityInStock;
         this.category = category;
+        this.isFav = isFav;
     }
 
     public Item(String name, String image, Double price) {
+        super();
         this.name = name;
         this.image = image;
         this.price = price;
         this.quantityInStock = 0;
         this.category = "Unknown";
+        this.isFav = 0;
     }
 
     public static List<Item> getAll() {
@@ -49,10 +52,15 @@ public class Item extends Model {
                 .execute();
     }
 
+    public static List<Item> getAllFavorites() {
+        return new Select()
+                .from(Item.class)
+                .where("isFav = ?", 1)
+                .execute();
+    }
 
     @Override
     public String toString() {
-        getId();
         return "Item{" +
                 "id=" + getId() +
                 ", name='" + name + '\'' +
@@ -60,6 +68,7 @@ public class Item extends Model {
                 ", price=" + price +
                 ", quantityInStock=" + quantityInStock +
                 ", category='" + category + '\'' +
+                ", isFav=" + isFav +
                 '}';
     }
 
@@ -81,6 +90,14 @@ public class Item extends Model {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public int getIsFav() {
+        return isFav;
+    }
+
+    public void setIsFav(int isFav) {
+        this.isFav = isFav;
     }
 
     public String getName() {
